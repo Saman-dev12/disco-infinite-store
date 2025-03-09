@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth"
+import { DefaultSession, NextAuthOptions } from "next-auth"
 import Discord from "next-auth/providers/discord"
 
 declare module "next-auth" {
@@ -47,20 +47,23 @@ export const authOptions:NextAuthOptions = {
 
     async signIn({ user }) {
         if (!user.email) return false;
+        console.log(user)
         try {
-            const existingUser = db.user.findFirst({
+            const existingUser = await db.user.findFirst({
                 where:{
                     email:user.email
                 }
             })
+            console.log(existingUser)
             if(!existingUser){
-                await db.user.create({
+                const res = await db.user.create({
                     data:{
                         email:user.email,
                         name:user.name,
                         image:user.image,
                     }
                 })
+                console.log(res)
             }
             return true;
 
