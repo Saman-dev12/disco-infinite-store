@@ -1,4 +1,5 @@
 import { db } from "@/db/db";
+import { randomUUID } from "crypto";
 import { DefaultSession, NextAuthOptions } from "next-auth"
 import Discord from "next-auth/providers/discord"
 
@@ -47,14 +48,12 @@ export const authOptions:NextAuthOptions = {
 
     async signIn({ user }) {
         if (!user.email) return false;
-        console.log(user)
         try {
             const existingUser = await db.user.findFirst({
                 where:{
                     email:user.email
                 }
             })
-            console.log(existingUser)
             if(!existingUser){
                 const res = await db.user.create({
                     data:{
@@ -63,7 +62,6 @@ export const authOptions:NextAuthOptions = {
                         image:user.image,
                     }
                 })
-                console.log(res)
             }
             return true;
 
@@ -73,8 +71,13 @@ export const authOptions:NextAuthOptions = {
         }
     },
     async jwt({ token, user }) {
+      const dbUser = await db.user.findFirst({
+        where: {
+          email: token.email,
+        },
+      })
         if (user) {
-          token.id = user.id;
+          token.id = dbUser?.id || "";
           token.name = user.name ?? '';
           token.email = user.email ?? '';
           token.image = user.image ?? '';
@@ -93,6 +96,9 @@ export const authOptions:NextAuthOptions = {
     },
   pages: {
     signIn: "/auth/signin", 
+  },
+  session:{
+    strategy:"jwt"
   },
   secret: process.env.NEXTAUTH_SECRET as string,
 
