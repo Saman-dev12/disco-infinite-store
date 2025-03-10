@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Upload, Shield, Zap } from "lucide-react"
+import { ModeToggle } from "./toggle-theme"
 
 export default function LandingPage() {
     return (
@@ -23,16 +24,19 @@ export default function LandingPage() {
                             FAQ
                         </Link>
                     </nav>
+                    <div className="flex gap-4">
+                    <ModeToggle/>
                     <Link href="/signin">
                         <Button>
                             Sign In
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </Link>
+                    </div>
                 </div>
             </header>
             <main className="flex-1">
-                <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+                <section className="w-full py-12 md:py-12 lg:py-12 xl:py-12">
                     <div className="container px-4 md:px-6">
                         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
                             <div className="flex flex-col justify-center space-y-4">
@@ -41,8 +45,7 @@ export default function LandingPage() {
                                         Seamlessly Upload & Store Files via Discord
                                     </h1>
                                     <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                                        Upload your Files securely, store them on Discord's CDN, and access them anywhere. The simplest way
-                                        to manage your image library.
+                                        Effortlessly upload and store any number of images securely on Discord's CDN. Access your image library from anywhere with ease.
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -60,8 +63,8 @@ export default function LandingPage() {
                                     </Link>
                                 </div>
                             </div>
-                            <Image
-                                src="/placeholder.svg?height=550&width=550"
+                            <img
+                                src="https://discoimg.vercel.app/images/1348718320563781682"
                                 width={550}
                                 height={550}
                                 alt="Hero image showing image upload interface"

@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Bell, Settings, LogOut, User, Upload, Home, ImageIcon, History, FolderHeart } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
+import { ModeToggle } from "./toggle-theme"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -33,7 +34,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState(3)
 
   return (
-    <div className="dark">
+    <div className="">
       <div className="flex min-h-screen bg-background">
        
 
@@ -46,6 +47,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <span className="font-bold">DiscoFiles</span>
               </div>
               <div className="ml-auto flex items-center gap-4">
+                <ModeToggle/>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon" className="relative">
@@ -79,7 +81,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                        <AvatarImage src={data?.user.image} alt="User" />
                         <AvatarFallback>{data?.user.email[0].toUpperCase()}</AvatarFallback>
                       </Avatar>
                     </Button>
