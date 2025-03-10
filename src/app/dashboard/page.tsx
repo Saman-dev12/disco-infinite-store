@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Copy, Trash2, Upload, ImageIcon, X, Check } from "lucide-react"
+import { Copy, Trash2, Upload, ImageIcon, X, Check, Heart } from "lucide-react"
 import Image from "next/image"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Label } from "@/components/ui/label"
@@ -34,10 +34,21 @@ export default function DashboardPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadedFiles, setUploadedFiles] = useState<Fileschema[]>([])
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [imageData,setImageData] = useState<string>()
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0])
+      setSelectedFile(e.target.files[0]);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUri = reader.result;
+        setImageData(imageDataUri as string);
+      };
+      reader.readAsDataURL(e.target.files[0]);
     }
   }
 
@@ -126,11 +137,11 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {uploadedFiles.map((file) => (
+          {uploadedFiles.slice(0).reverse().map((file) => (
             
             <Card key={file.id} className="overflow-hidden group">
               <div className="relative aspect-square">
-                <Image src={file.cdn || "/placeholder.svg"} alt={file.name} fill className="object-cover" />
+                <Image src={file.cdn || "/placeholder.svg"} alt={file.name} fill className="object-contain" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <Button
                     variant="secondary"
@@ -142,6 +153,13 @@ export default function DashboardPage() {
                   </Button>
                   <Button variant="destructive" size="icon" onClick={() => handleDelete(file.id)} className="h-9 w-9">
                     <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                  className="h-9 w-9"
+                  size="icon"
+                  variant="secondary"
+                  >
+                    <Heart className="h-4 w-4"/>
                   </Button>
                 </div>
               </div>
@@ -170,7 +188,15 @@ export default function DashboardPage() {
             {selectedFile ? (
               <>
               <div className="relative border rounded-lg p-2">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col items-center gap-2">
+                <Image
+                src={imageData || "/placeholder.svg"}
+                alt="Uploaded"
+                className="w-full h-64 object-contain border rounded-lg overflow-hidden cursor-pointer"
+                width={400}
+                height={200}
+                onClick={() => inputRef.current?.click()}
+              /> 
                   <ImageIcon className="h-8 w-8 text-muted-foreground" />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{selectedFile.name.slice(0,20)}...</p>
