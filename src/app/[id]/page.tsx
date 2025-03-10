@@ -7,7 +7,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { ImageDownloadButton } from "@/components/image-download-button"
 
-async function UserImage({ params }: { params: { id: string } }) {
+async function UserImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   // Fetch image from database
