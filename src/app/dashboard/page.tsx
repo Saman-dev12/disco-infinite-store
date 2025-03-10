@@ -93,7 +93,7 @@ export default function DashboardPage() {
   }
 
   const copyToClipboard = (url: string, id: string) => {
-    navigator.clipboard.writeText(`https://${process.env.NEXT_PUBLIC_URL}/${encodeURI(id)}`)
+    navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_URL}/images/${encodeURI(id)}`)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
   }
