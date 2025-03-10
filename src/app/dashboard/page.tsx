@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,8 +17,12 @@ import {
 import { Copy, Trash2, Upload, ImageIcon, X, Check } from "lucide-react"
 import Image from "next/image"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
+import Link from "next/link"
 
-interface FileSchema{
+
+interface Fileschema{
   id : string,
   name:string,
   cdn:string,
@@ -28,7 +32,7 @@ interface FileSchema{
 export default function DashboardPage() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [uploadedFiles, setUploadedFiles] = useState<FileSchema[]>([])
+  const [uploadedFiles, setUploadedFiles] = useState<Fileschema[]>([])
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,33 +41,63 @@ export default function DashboardPage() {
     }
   }
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      // In a real app, you would upload the file to Discord here
-      // For now, we'll just add it to our local state
-      const newFile = {
-        id: (uploadedFiles.length + 1).toString(),
-        name: selectedFile.name,
-        cdn: "/placeholder.svg?height=400&width=400", // Placeholder for the actual Discord CDN URL
-        createdAt: new Date(),
-      }
+  useEffect(()=>{
+    getAllFiles()
+  },[])
 
-      setUploadedFiles([newFile, ...uploadedFiles])
+  async function getAllFiles(){
+    try{
+
+      const res = await fetch("/api/getAllFiles");
+      const data = await res.json();
+      
+      setUploadedFiles(data.Files)
+    }catch(error:any){
+      toast.error("Cannot fetch your Files")
+    }
+  }
+
+  const handleUpload = async() => {
+    if (selectedFile) {
+      const formdata = new FormData()
+      formdata.append("file", selectedFile)
+      console.log(selectedFile)
+
+      const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formdata,
+      })
+
+      const data = await res.json()
+
+      toast(data.message)
+
+      await getAllFiles()
+    
       setSelectedFile(null)
       setIsUploadModalOpen(false)
     }
   }
 
-  const handleDelete = (id: string) => {
-    // In a real app, you would delete the file from Discord here
-    setUploadedFiles(uploadedFiles.filter((file) => file.id !== id))
+  const handleDelete = async(id: string) => {
+    const res = await fetch(`/api/delete?id=${id}`,{
+      method:"DELETE"
+    })
+
+    const data = await res.json();
+
+    toast(data.message)
+
+   await getAllFiles()
+
   }
 
   const copyToClipboard = (url: string, id: string) => {
-    navigator.clipboard.writeText(url)
+    navigator.clipboard.writeText(`https://${process.env.NEXT_PUBLIC_URL}/${encodeURI(id)}`)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
   }
+
 
   return (
     <div className="w-[100%]">
@@ -93,6 +127,7 @@ export default function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {uploadedFiles.map((file) => (
+            
             <Card key={file.id} className="overflow-hidden group">
               <div className="relative aspect-square">
                 <Image src={file.cdn || "/placeholder.svg"} alt={file.name} fill className="object-cover" />
@@ -110,14 +145,16 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </div>
+              <Link href={`/${file.id}`}>
               <CardContent className="p-3">
                 <div className="flex justify-between items-center">
                   <p className="font-medium truncate" title={file.name}>
                     {file.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">{file.createdAt.toLocaleDateString()}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(file.createdAt).toLocaleDateString()}</p>
                 </div>
               </CardContent>
+              </Link>
             </Card>
           ))}
         </div>
@@ -131,11 +168,12 @@ export default function DashboardPage() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {selectedFile ? (
+              <>
               <div className="relative border rounded-lg p-2">
                 <div className="flex items-center gap-2">
                   <ImageIcon className="h-8 w-8 text-muted-foreground" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{selectedFile.name}</p>
+                    <p className="font-medium truncate">{selectedFile.name.slice(0,20)}...</p>
                     <p className="text-xs text-muted-foreground">{(selectedFile.size / 1024).toFixed(2)} KB</p>
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => setSelectedFile(null)} className="h-8 w-8">
@@ -143,18 +181,23 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </div>
+              </>
             ) : (
-              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12 text-center">
+              <>
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12 text-center">
                 <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
                 <p className="mb-1 font-medium">Drag and drop your image here</p>
                 <p className="text-xs text-muted-foreground mb-4">Supports: JPG, PNG, GIF (max 8MB)</p>
                 <Input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                <label htmlFor="file-upload">
+                <Label htmlFor="file-upload">
                   <Button variant="secondary" className="cursor-pointer" asChild>
-                    <span>Select Image</span>
+                  <span>Select Image</span>
                   </Button>
-                </label>
-              </div>
+                </Label>
+                
+                </div>
+                
+              </>
             )}
           </div>
           <DialogFooter>

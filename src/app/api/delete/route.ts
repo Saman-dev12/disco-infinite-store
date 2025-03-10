@@ -12,6 +12,7 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    console.log(id)
 
     try {
 
@@ -36,6 +37,6 @@ export async function DELETE(request: NextRequest) {
 
         return NextResponse.json({ message: "Image deleted successfully" }, { status: 200 });
     }catch (error) {
-        NextResponse.json({ error: "Error deleting image" }, { status: 500 });
+        return NextResponse.json({ error: "Error deleting image" }, { status: 500 });
     }
 }

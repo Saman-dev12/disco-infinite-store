@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
     try {
         const data = await request.formData();
         const file = data.get("file") as File;
-        const filename = data.get("filename") as string;
 
         if (!file) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -27,24 +26,25 @@ export async function POST(request: NextRequest) {
         const res: any = await client.post(
             `/channels/${process.env.DISCORD_CHANNEL_ID}/messages`,
             {
-                files: [{ name: filename, data: buff,contentType:file.type,key:filename }],
+                files: [{ name: file.name, data: buff,contentType:file.type || 'image/png',key:file.name }],
             }
         );
+        
+        console.log(file.type)
 
         const cdnUrl = res?.attachments?.[0]?.url || null;
-        console.log(res.attachments[0].id)    
         if(cdnUrl){
             await db.image.create({
                 data: {
                     id:res.attachments[0].id,
                     cdn:cdnUrl,
-                    name:filename,
+                    name:file.name,
                     userId:session.user.id,
                 }
             })
         }
 
-        return NextResponse.json({ cdnUrl }, { status: 200 });
+        return NextResponse.json({ message:"File uploaded successfully" }, { status: 200 });
 
     } catch (error) {
         console.error("Upload failed:", error);

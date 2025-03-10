@@ -10,7 +10,7 @@ export default function LandingPage() {
                 <div className="container flex h-16 items-center justify-between px-4 md:px-6">
                     <div className="flex items-center gap-2 font-bold">
                         <Upload className="h-6 w-6" />
-                        <span>DiscoFiles</span>
+                        <span>DiscoImages</span>
                     </div>
                     <nav className="hidden md:flex gap-6">
                         <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
