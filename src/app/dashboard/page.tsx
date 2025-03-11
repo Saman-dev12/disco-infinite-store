@@ -154,13 +154,13 @@ export default function DashboardPage() {
                   <Button variant="destructive" size="icon" onClick={() => handleDelete(file.id)} className="h-9 w-9">
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button 
+                  {/* <Button 
                   className="h-9 w-9"
                   size="icon"
                   variant="secondary"
                   >
                     <Heart className="h-4 w-4"/>
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
               <Link href={`/${file.id}`}>
