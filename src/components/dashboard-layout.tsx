@@ -48,7 +48,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="ml-auto flex items-center gap-4">
                 <ModeToggle/>
-                <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon" className="relative">
                       <Bell className="h-4 w-4" />
@@ -76,7 +76,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                       <span>Mark all as read</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full">
@@ -144,22 +144,22 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive("/dashboard/favorites")}>
               <Link href="/dashboard/favorites">
                 <FolderHeart className="h-4 w-4" />
                 <span>Favorites</span>
               </Link>
             </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
+          </SidebarMenuItem> */}
+          {/* <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive("/dashboard/history")}>
               <Link href="/dashboard/history">
                 <History className="h-4 w-4" />
                 <span>Upload History</span>
               </Link>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
